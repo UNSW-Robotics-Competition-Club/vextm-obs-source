@@ -1,5 +1,7 @@
 #pragma once
 
+#include <windows.h>
+
 #define SHM_FD_INVALID NULL
 
 typedef HANDLE shm_file_t;

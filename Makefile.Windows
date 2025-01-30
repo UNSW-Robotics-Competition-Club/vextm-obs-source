@@ -14,7 +14,7 @@ OBS_INSTALL := "$(shell cygpath -u "$$PROGRAMFILES/obs-studio")"
 CC = x86_64-w64-mingw32-gcc
 STRIP = x86_64-w64-mingw32-strip
 
-CFLAGS = -m64 -Wall
+CFLAGS = -m64 -Wall -Wno-unused-function
 INCLUDES = -I$(OBS_SOURCE)/libobs
 LIBS = -L$(OBS_INSTALL)/bin/64bit -static-libgcc -mwindows -Wl,-Bdynamic -lobs -Wl,-Bstatic -lpthread
 
