@@ -78,21 +78,26 @@ void shm_sem_close(shm_sem_t sem, char* name) {
 plat_pid_t plat_spawn(const char* file, char* const args[]) {
     char cmd[1024];
 
-    snprintf(cmd, 1024, "%s", file);
-    for(int i = 0; args[i] != NULL; i++) {
-        snprintf(cmd, 1024, "%s %s", cmd, args[i]);
+    // Quote the executable path since it normally contains spaces. Build the
+    // command line by appending rather than passing cmd to snprintf as both
+    // the destination and a source, which is undefined behaviour.
+    size_t len = snprintf(cmd, sizeof(cmd), "\"%s\"", file);
+    for(int i = 0; args[i] != NULL && len < sizeof(cmd); i++) {
+        len += snprintf(cmd + len, sizeof(cmd) - len, " %s", args[i]);
     }
 
     info("Windows display command: %s", cmd);
 
+    // Run from the executable's directory, TM looks for Log.cfg there
     char* dir;
     char path[1024];
-    strncpy(path, cmd, 1024);
+    snprintf(path, sizeof(path), "%s", file);
     dir = get_dirname(path);
 
-    STARTUPINFO si;
+    STARTUPINFOA si;
     PROCESS_INFORMATION pi;
     ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
     if(CreateProcessA(NULL,
                 cmd,
@@ -105,12 +110,17 @@ plat_pid_t plat_spawn(const char* file, char* const args[]) {
                 &si,
                 &pi) == 0) {
         warn("CreateProcess failed: %ld", GetLastError());
+    } else {
+        CloseHandle(pi.hThread);
     }
     return pi.hProcess;
 }
 
 void plat_kill(plat_pid_t pid) {
-    TerminateProcess(pid, 0);
+    if(pid != NULL) {
+        TerminateProcess(pid, 0);
+        CloseHandle(pid);
+    }
 }
 
 // Function get_dirname strips the last component off the path in order to

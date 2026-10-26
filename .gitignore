@@ -53,3 +53,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# OBS headers fetched by build-obs33/build.ps1
+build-obs33/obs-*/
+*.def

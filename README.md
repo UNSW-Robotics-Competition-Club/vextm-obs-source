@@ -12,7 +12,7 @@ VEX Tournament Manager display source plugin for OBS Studio.
 
 ## Support
 
-Please note this is *unofficial software*. It is not supported or endorsed by VEX Robotics or the REC Foundation in any way. Please do not contact VEX or RECF with any issues related to this plugin.
+Please note this is *unofficial software*. It is not supported or endorsed by VEX Robotics or the Global Robotics and Science Foundation in any way. Please do not contact VEX or GRSF with any issues related to this plugin.
 
 If you think you have found a bug, please [log an issue](https://gitlab.com/dwabtech/vextm-obs-source/issues). We request that you do not use the issue tracker for support requests.
 
@@ -32,6 +32,19 @@ unzip -d ~/.config/obs-studio/plugins/ vextm-source.zip
 ```
 
 After that, restart OBS Studio and it should load the new plugin.
+
+### OBS 33 on Windows
+
+Earlier builds fail to load in OBS 33 (`Module '.../vextm-source.dll' not loaded`) because they import `gs_image_file_free` and `gs_image_file_init_texture`, which libobs no longer exports. Rebuild against the OBS 33 headers with `build-obs33\build.ps1`, which needs Visual Studio 2022 Build Tools, LLVM `clang-cl` and an installed copy of OBS 33.
+
+The script also builds `VEXTMOBSPluginInstaller.exe` from `setup.nsi` when NSIS is installed (`scoop install nsis`). The installer must be run with OBS closed. It removes any legacy copy, installs the plugin, and registers an uninstaller under Add/Remove Programs.
+
+To install by hand instead, use the per-plugin layout OBS now uses, rather than the legacy `obs-plugins\64bit` folder:
+```
+C:\ProgramData\obs-studio\plugins\vextm-source\bin\64bit\vextm-source.dll
+C:\ProgramData\obs-studio\plugins\vextm-source\data\locale\en-US.ini
+```
+Remove any old copy from `C:\Program Files\obs-studio\obs-plugins\64bit\` so it isn't picked up instead.
 
 ## Usage
 
